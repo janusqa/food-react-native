@@ -9,8 +9,8 @@ import {
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RouteProp } from '@react-navigation/native';
-import { RootStackParamList } from '../App';
-import MealDetails from './MealDetails';
+import { RootStackParamList } from '../../App';
+import MealDetails from '../MealDetails';
 
 type MealOverviewNavigationProps = NativeStackNavigationProp<
     RootStackParamList,
@@ -26,7 +26,7 @@ type Props = {
     duration: number;
     complexity: string;
     affordability: string;
-    onPress: (mealId: string) => void;
+    onPress?: (mealId: string) => void;
 };
 
 const MealItem: React.FC<Props> = ({
@@ -36,7 +36,7 @@ const MealItem: React.FC<Props> = ({
     duration,
     complexity,
     affordability,
-    onPress,
+    onPress, // we no longer pass in a hander since we can do navigation via useNavigation hook directly in this component.
 }) => {
     // note wer are passing in an onPress from parent component
     // which we can use to navigate to Meals Details from that page,

@@ -1,9 +1,8 @@
-import { StyleSheet, View, FlatList } from 'react-native';
 import { useLayoutEffect } from 'react';
 import { MEALS, CATEGORIES } from '../data/dumm-data';
 import { RootStackParamList } from '../App';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import MealItem from '../components/MealItem';
+import MealsList from '../components/MealsList/MealsList';
 
 export type Props = NativeStackScreenProps<RootStackParamList, 'MealsOverview'>;
 
@@ -16,21 +15,6 @@ const MealsOverviewPage: React.FC<Props> = ({ navigation, route }) => {
 
     const pressHandler = (mealId: string) => {
         navigation.navigate('MealDetails', { mealId });
-    };
-
-    const renderMealItem = (mealId: string) => {
-        const meal = MEALS.find((meal) => meal.id === mealId);
-
-        const mealProps = {
-            id: meal.id,
-            title: meal.title,
-            imageUrl: meal.imageUrl,
-            duration: meal.duration,
-            affordability: meal.affordability,
-            complexity: meal.complexity,
-            onPress: pressHandler,
-        };
-        return <MealItem {...mealProps} />;
     };
 
     // useLayoutEffect instead of useEffect because we need
@@ -51,22 +35,7 @@ const MealsOverviewPage: React.FC<Props> = ({ navigation, route }) => {
         [categoryId]
     );
 
-    return (
-        <View style={styles.container}>
-            <FlatList
-                data={displayedMeals}
-                renderItem={(meal) => renderMealItem(meal.item.id)}
-                keyExtractor={(meal) => meal.id}
-            />
-        </View>
-    );
+    return <MealsList displayedMeals={displayedMeals} onPress={pressHandler} />;
 };
 
 export default MealsOverviewPage;
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 16,
-    },
-});

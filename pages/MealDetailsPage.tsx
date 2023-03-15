@@ -7,6 +7,8 @@ import MealDetailsSnippet from '../components/MealDetails';
 import Subtitle from '../components/MealDetails/Subtitle';
 import List from '../components/MealDetails/List';
 import IconButton from '../components/IconButton';
+import { useAppDispatch, useAppSelector } from '../store/hooks/useStore';
+import { addFavorite, removeFavorite, getFavoritedMeals } from '../store/meals';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'MealDetails'>;
 
@@ -16,8 +18,13 @@ const MealDetails: React.FC<Props> = ({ navigation, route }) => {
         [route.params.mealId]
     );
 
-    const headerButtonPressHandler = () => {
-        console.log('Presseddd');
+    const mealIsFavorited = useAppSelector(getFavoritedMeals).includes(meal.id);
+
+    const dispatch = useAppDispatch();
+
+    const changeFavoriteStatusHandler = () => {
+        if (mealIsFavorited) dispatch(removeFavorite({ mealId: meal.id }));
+        else dispatch(addFavorite({ mealId: meal.id }));
     };
 
     // useLayoutEffect instead of useEffect because we need
@@ -31,23 +38,18 @@ const MealDetails: React.FC<Props> = ({ navigation, route }) => {
             // instead of add them to options prop back in parent component
             navigation.setOptions({
                 title: meal.title,
+                headerRight: () => (
+                    <IconButton
+                        icon={mealIsFavorited ? 'star' : 'star-outline'}
+                        size={24}
+                        color="white"
+                        onPress={changeFavoriteStatusHandler}
+                    />
+                ),
             });
         },
-        [route.params.mealId]
+        [route.params.mealId, mealIsFavorited]
     );
-
-    useLayoutEffect(function () {
-        navigation.setOptions({
-            headerRight: () => (
-                <IconButton
-                    icon="star"
-                    size={24}
-                    color="white"
-                    onPress={headerButtonPressHandler}
-                />
-            ),
-        });
-    }, []);
 
     return (
         <ScrollView style={styles.rootContainer}>

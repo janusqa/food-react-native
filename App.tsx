@@ -1,26 +1,81 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, Button } from 'react-native';
+import { StyleSheet } from 'react-native';
+import { Provider } from 'react-redux';
+import initilizeStore from './store/configureStore';
 import CategoriesPage from './pages/CategoriesPage';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import MealsOverviewPage from './pages/MealsOverViewPage';
 import MealDetailsPage from './pages/MealDetailsPage';
+// we will nest some navigation
+import { createDrawerNavigator } from '@react-navigation/drawer';
+import { NavigatorScreenParams } from '@react-navigation/native';
+import MealFavoritesPage from './pages/MealFavoritesPage';
+import { Ionicons } from '@expo/vector-icons';
 
 export type RootStackParamList = {
-    MealsCategories: undefined;
+    MealDrawer: NavigatorScreenParams<DrawerParamList>;
     MealsOverview: { categoryId: string };
     MealDetails: { mealId: string };
 };
 
-const App: React.FC = () => {
-    const Stack = createNativeStackNavigator<RootStackParamList>();
+export type DrawerParamList = {
+    MealsCategories: undefined;
+    MealFavorites: undefined;
+};
 
+const Stack = createNativeStackNavigator<RootStackParamList>();
+const Drawer = createDrawerNavigator<DrawerParamList>();
+const store = initilizeStore();
+
+const DrawerNavigator: React.FC = () => {
     return (
-        <>
+        <Drawer.Navigator
+            initialRouteName="MealsCategories"
+            screenOptions={{
+                headerStyle: { backgroundColor: '#351401' },
+                headerTintColor: 'white',
+                sceneContainerStyle: {
+                    // in Drawer navigator contentStyle is renamed scenceContainerStyle. Who knows why???
+                    backgroundColor: '#3f2f25',
+                },
+                drawerContentStyle: { backgroundColor: '#351401' },
+                drawerInactiveTintColor: 'white',
+                drawerActiveTintColor: '#351401',
+                drawerActiveBackgroundColor: '#e4baa1',
+            }}
+        >
+            <Drawer.Screen
+                name="MealsCategories"
+                component={CategoriesPage}
+                options={{
+                    title: 'Categories',
+                    drawerIcon: ({ color, size }) => (
+                        <Ionicons name="list" size={size} color={color} />
+                    ),
+                }}
+            />
+            <Drawer.Screen
+                name="MealFavorites"
+                component={MealFavoritesPage}
+                options={{
+                    title: 'Favorites',
+                    drawerIcon: ({ color, size }) => (
+                        <Ionicons name="star" size={size} color={color} />
+                    ),
+                }}
+            />
+        </Drawer.Navigator>
+    );
+};
+
+const App: React.FC = () => {
+    return (
+        <Provider store={store}>
             <StatusBar style="light" />
             <NavigationContainer>
                 <Stack.Navigator
-                    initialRouteName="MealsCategories"
+                    initialRouteName="MealDrawer"
                     screenOptions={{
                         headerStyle: { backgroundColor: '#351401' },
                         headerTintColor: 'white',
@@ -30,10 +85,11 @@ const App: React.FC = () => {
                     }}
                 >
                     <Stack.Screen
-                        name="MealsCategories"
-                        component={CategoriesPage}
+                        name="MealDrawer"
+                        component={DrawerNavigator}
                         options={{
                             title: 'Meal Categories',
+                            headerShown: false,
                         }}
                     />
                     <Stack.Screen
@@ -58,7 +114,7 @@ const App: React.FC = () => {
                     />
                 </Stack.Navigator>
             </NavigationContainer>
-        </>
+        </Provider>
     );
 };
 
